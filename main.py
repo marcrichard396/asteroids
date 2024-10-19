@@ -32,7 +32,6 @@ def main():
             if event.type == pygame.QUIT:
                 return
 
-
         dt = timer.tick(60) / 1000
         screen.fill("black")
         
@@ -43,6 +42,10 @@ def main():
             if asteroid.collision(player) == True:
                 print("Game over!")
                 return
+            for shot in shots:
+                if asteroid.collision(shot) == True:
+                    asteroid.split()
+                    shot.kill()
 
         for member in drawable:
             member.draw(screen)
