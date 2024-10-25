@@ -3,6 +3,7 @@ from constants import *
 from player import *
 from asteroidfield import *
 from shot import *
+from score import *
 
 
 def main():
@@ -11,6 +12,8 @@ def main():
 
     timer = pygame.time.Clock()
     dt = 0
+
+    score = Score()
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -35,16 +38,23 @@ def main():
         dt = timer.tick(60) / 1000
         screen.fill("black")
         
+        font = pygame.font.SysFont("arialblack", 30)
+        score_text = font.render(f"Score: {score.get_score()}", True, "white")
+        screen.blit(score_text, (SCREEN_WIDTH - 120, 10))
+
         for member in updatable:
             member.update(dt)
 
         for asteroid in asteroids:
             if asteroid.collision(player) == True:
                 print("Game over!")
+                print(f"High score: {score.get_high_score()} pts")
+                print(f"Your score: {score.get_score()} pts")
+                score.write_high_score()
                 return
             for shot in shots:
                 if asteroid.collision(shot) == True:
-                    asteroid.split()
+                    asteroid.split(score)
                     shot.kill()
 
         for member in drawable:
