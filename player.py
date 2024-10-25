@@ -7,6 +7,7 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shoot_cooldown = 0
+        self.speed = 0
 
     # in the player class
     def triangle(self):
@@ -32,19 +33,45 @@ class Player(CircleShape):
             self.rotate(-dt)
         if keys[pygame.K_d]:
             self.rotate(dt)
+
         if keys[pygame.K_w]:
-            self.move(dt)
+            self.accelerate(dt)
         if keys[pygame.K_s]:
-            self.move(-dt)
+            self.accelerate(-dt)
+        if not(keys[pygame.K_w] or keys[pygame.K_s]):
+            if self.speed > 0: 
+                self.deccelerate(dt)
+            elif self.speed < 0:
+                self.deccelerate(-dt)
+
         if keys[pygame.K_SPACE]:
             self.shoot()
+        if keys[pygame.K_ESCAPE]:
+            pass
 
         self.shoot_cooldown -= dt
-        
+        self.move(dt)
+
 
     def move(self, dt):
         foward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.position += foward * PLAYER_SPEED * dt
+        self.position += foward * self.speed * dt
+
+
+    def accelerate(self, dt):
+        if (self.speed + PLAYER_ACCELERATION * dt) > PLAYER_MAX_SPEED:
+            self.speed = PLAYER_MAX_SPEED
+        elif (self.speed + PLAYER_ACCELERATION * dt) < -PLAYER_MAX_SPEED:
+            self.speed = -PLAYER_MAX_SPEED
+        else:
+            self.speed += PLAYER_ACCELERATION * dt
+
+
+    def deccelerate(self, dt): 
+        if (abs(self.speed) - abs(2 / 3 * PLAYER_ACCELERATION * dt)) < 0:
+            self.speed = 0
+        else:
+            self.speed -= 2 / 3 * PLAYER_ACCELERATION * dt
 
 
     def shoot(self):
